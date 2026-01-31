@@ -1,0 +1,16 @@
+.idea/
+**.local.*
+.venv/
+build/
+.vscode/
+*.iml
+speckit.*
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore Kotlin plugin data
+.kotlin

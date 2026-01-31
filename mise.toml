@@ -1,0 +1,57 @@
+experimental_monorepo_root = true
+
+[monorepo]
+config_roots = ["."]
+
+[tools]
+node = "25.5.0"
+"aqua:anthropics/claude-code" = "2.1.27"
+shellcheck = "0.11.0"
+pre-commit = "4.5.1"
+markdownlint-cli2 = "0.20.0"
+prettier = "3.8.1"
+shfmt = "3.12.0"
+python = "3.14.2"
+yamllint = "1.38.0"
+java = "25.0.2"
+gradle = "9.3.1"
+trivy = "0.69.0"
+"aqua:tailwindlabs/tailwindcss" = "4.1.18"
+bats = "1.13.0"
+
+[tasks.bump]
+description = "Upgrade all dependencies and libraries"
+run = """
+set -euo pipefail
+mise upgrade --bump
+uv lock --upgrade
+"""
+
+[tasks.check]
+description = "Run all checks"
+run = "echo sucess"
+
+[tasks."docker:build"]
+description = "Build the Docker image"
+run = """
+set -euo pipefail
+TAILWINDCSS_VERSION=$(mise current aqua:tailwindlabs/tailwindcss | awk '{print $1}')
+docker build --build-arg TAILWINDCSS_VERSION="$TAILWINDCSS_VERSION" -t demo-kotlin-htmx .
+"""
+
+[tasks."docker:run"]
+description = "Run the Docker container on port 8080"
+depends = ["docker:build"]
+run = """
+set -euo pipefail
+docker rm -f demo-kotlin-htmx 2>/dev/null || true
+docker run -d --rm --name demo-kotlin-htmx -p 8080:8080 demo-kotlin-htmx
+echo "App running at http://localhost:8080/dashboard"
+"""
+
+[env]
+DOCKER_BUILDKIT = "1"
+CLAUDE_CODE_ENABLE_TASKS = "true"
+
+[settings]
+experimental = true
